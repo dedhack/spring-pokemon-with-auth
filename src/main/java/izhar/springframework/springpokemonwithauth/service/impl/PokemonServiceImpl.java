@@ -5,6 +5,9 @@ import izhar.springframework.springpokemonwithauth.exceptions.PokemonNotFoundExc
 import izhar.springframework.springpokemonwithauth.models.Pokemon;
 import izhar.springframework.springpokemonwithauth.repository.PokemonRepository;
 import izhar.springframework.springpokemonwithauth.service.PokemonService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,10 +39,16 @@ public class PokemonServiceImpl implements PokemonService {
     }
 
     @Override
-    public List<PokemonDto> getAllPokemon() {
-        List<Pokemon> pokemon = pokemonRepository.findAll(); // what we retrieve is the Pokemon obj and not a rare case that requires pokemonDto
+    public List<PokemonDto> getAllPokemon(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Pokemon> pokemons = pokemonRepository.findAll(pageable); // what we retrieve is the Pokemon obj and not a rare case that requires pokemonDto
+
         // Map returns a new list, unlike a for loop with no return
-        return pokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+        // return pokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+
+        // Do with Pagination instead
+        List<Pokemon> listOfPokemon = pokemons.getContent();
+        return listOfPokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
     }
 
     @Override
