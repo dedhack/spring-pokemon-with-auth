@@ -1,6 +1,7 @@
 package izhar.springframework.springpokemonwithauth.service.impl;
 
 import izhar.springframework.springpokemonwithauth.dto.PokemonDto;
+import izhar.springframework.springpokemonwithauth.exceptions.PokemonNotFoundException;
 import izhar.springframework.springpokemonwithauth.models.Pokemon;
 import izhar.springframework.springpokemonwithauth.repository.PokemonRepository;
 import izhar.springframework.springpokemonwithauth.service.PokemonService;
@@ -39,6 +40,30 @@ public class PokemonServiceImpl implements PokemonService {
         List<Pokemon> pokemon = pokemonRepository.findAll(); // what we retrieve is the Pokemon obj and not a rare case that requires pokemonDto
         // Map returns a new list, unlike a for loop with no return
         return pokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+    }
+
+    @Override
+    public PokemonDto getPokemonById(int id) {
+        Pokemon pokemon = pokemonRepository.findById(id).orElseThrow(()-> new PokemonNotFoundException("Pokemon could not be found"));
+        return mapToDto(pokemon);
+    }
+
+    @Override
+    public PokemonDto updatePokemon(PokemonDto pokemonDto, int id) {
+       Pokemon pokemon = pokemonRepository.findById(id).orElseThrow(()-> new PokemonNotFoundException("Pokemon could not be updated"));
+
+       // the data into the database needs to be pokemon and not pokemonDto
+       pokemon.setName(pokemonDto.getName());
+       pokemon.setType(pokemonDto.getType());
+
+       Pokemon updatedPokemon = pokemonRepository.save(pokemon);
+       return mapToDto(updatedPokemon);
+    }
+
+    @Override
+    public void deletePokemonId(int id) {
+        Pokemon pokemon = pokemonRepository.findById(id).orElseThrow(()-> new PokemonNotFoundException("Pokemon could not be deleted"));
+        pokemonRepository.delete(pokemon);
     }
 
     // Mapper
