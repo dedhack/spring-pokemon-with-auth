@@ -1,6 +1,9 @@
 package izhar.springframework.springpokemonwithauth.controllers;
 
+import izhar.springframework.springpokemonwithauth.dto.PokemonDto;
 import izhar.springframework.springpokemonwithauth.models.Pokemon;
+import izhar.springframework.springpokemonwithauth.service.PokemonService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,27 +16,29 @@ import java.util.List;
 @RequestMapping("/api/")
 public class PokemonController {
 
-    // for tutorial purposes, we don't do this for production
-    @GetMapping("pokemon")
-    public ResponseEntity<List<Pokemon>> getPokemon(){
-        List<Pokemon> pokemons = new ArrayList<>();
-        pokemons.add(new Pokemon(1, "Squirtle", "Water"));
-        pokemons.add(new Pokemon(2, "Pikachu", "Electric"));
-        pokemons.add(new Pokemon(3, "Charmander", "Fire"));
-        return ResponseEntity.ok(pokemons);
+
+    private PokemonService pokemonService;
+
+    @Autowired
+    public PokemonController(PokemonService pokemonService) {
+        this.pokemonService = pokemonService;
     }
 
-//    @GetMapping("pokemon/{id}")
-//    public Pokemon pokemonDetail(@PathVariable int id){
-//        return new Pokemon(id, )
-//    }
+    // for tutorial purposes, we don't do this for production
+    @GetMapping("pokemon")
+    public ResponseEntity<List<PokemonDto>> getPokemon(){
+        return new ResponseEntity<>(pokemonService.getAllPokemon(), HttpStatus.OK);
+    }
+
+    @GetMapping("pokemon/{id}")
+    public Pokemon pokemonDetail(@PathVariable int id){
+        return new Pokemon(id, "Squirtle", "Water");
+    }
 
     @PostMapping("pokemon/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Pokemon> createPokemon(@RequestBody Pokemon pokemon){
-        System.out.println(pokemon.getName());
-        System.out.println(pokemon.getType());
-        return new ResponseEntity<>(pokemon, HttpStatus.CREATED);
+    public ResponseEntity<PokemonDto> createPokemon(@RequestBody PokemonDto pokemonDto){
+        return new ResponseEntity<>(pokemonService.createPokemon(pokemonDto), HttpStatus.CREATED);
     }
 
     @PutMapping("pokemon/{id}/update")
