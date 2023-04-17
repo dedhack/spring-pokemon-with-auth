@@ -20,6 +20,6 @@ public class GlobalExceptionHandler {
         errorObject.setMessage(ex.getMessage());
         errorObject.setTimestamp(new Date());
 
-        return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.NOT_FOUND)
+        return new ResponseEntity<ErrorObject>(errorObject, HttpStatus.NOT_FOUND);
     }
 }
