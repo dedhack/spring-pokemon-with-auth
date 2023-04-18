@@ -1,6 +1,7 @@
 package izhar.springframework.springpokemonwithauth.service.impl;
 
 import izhar.springframework.springpokemonwithauth.dto.PokemonDto;
+import izhar.springframework.springpokemonwithauth.dto.PokemonResponse;
 import izhar.springframework.springpokemonwithauth.exceptions.PokemonNotFoundException;
 import izhar.springframework.springpokemonwithauth.models.Pokemon;
 import izhar.springframework.springpokemonwithauth.repository.PokemonRepository;
@@ -39,7 +40,7 @@ public class PokemonServiceImpl implements PokemonService {
     }
 
     @Override
-    public List<PokemonDto> getAllPokemon(int pageNo, int pageSize) {
+    public PokemonResponse getAllPokemon(int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<Pokemon> pokemons = pokemonRepository.findAll(pageable); // what we retrieve is the Pokemon obj and not a rare case that requires pokemonDto
 
@@ -48,7 +49,19 @@ public class PokemonServiceImpl implements PokemonService {
 
         // Do with Pagination instead
         List<Pokemon> listOfPokemon = pokemons.getContent();
-        return listOfPokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+        List<PokemonDto> content = listOfPokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+
+        // get our pokemon response
+        // pokemons variable here is the interface of Page
+        PokemonResponse pokemonResponse = new PokemonResponse();
+        pokemonResponse.setContent(content);
+        pokemonResponse.setPageNo(pokemons.getNumber());
+        pokemonResponse.setPageSize(pokemons.getSize());
+        pokemonResponse.setTotalElements(pokemons.getTotalElements());
+        pokemonResponse.setTotalPages(pokemons.getTotalPages());
+        pokemonResponse.setLast(pokemonResponse.isLast());
+
+        return pokemonResponse;
     }
 
     @Override

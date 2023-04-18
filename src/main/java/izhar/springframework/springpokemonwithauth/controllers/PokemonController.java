@@ -1,6 +1,7 @@
 package izhar.springframework.springpokemonwithauth.controllers;
 
 import izhar.springframework.springpokemonwithauth.dto.PokemonDto;
+import izhar.springframework.springpokemonwithauth.dto.PokemonResponse;
 import izhar.springframework.springpokemonwithauth.models.Pokemon;
 import izhar.springframework.springpokemonwithauth.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class PokemonController {
 
     // for tutorial purposes, we don't do this for production
     @GetMapping("pokemon")
-    public ResponseEntity<List<PokemonDto>> getPokemon(
+    public ResponseEntity<PokemonResponse> getPokemon(
             @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10", required = true) int pageSize
     ){
