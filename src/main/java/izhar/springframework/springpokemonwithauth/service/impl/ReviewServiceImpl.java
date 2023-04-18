@@ -2,6 +2,7 @@ package izhar.springframework.springpokemonwithauth.service.impl;
 
 import izhar.springframework.springpokemonwithauth.dto.ReviewDto;
 import izhar.springframework.springpokemonwithauth.exceptions.PokemonNotFoundException;
+import izhar.springframework.springpokemonwithauth.exceptions.ReviewNotFoundException;
 import izhar.springframework.springpokemonwithauth.models.Pokemon;
 import izhar.springframework.springpokemonwithauth.models.Review;
 import izhar.springframework.springpokemonwithauth.repository.PokemonRepository;
@@ -31,7 +32,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = mapToEntity(reviewDto);
 
         // set the Pokemon for Review
-        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(()->new PokemonNotFoundException("Pokemon not found"));
+        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(()->new PokemonNotFoundException("Pokemon with associated review not found"));
         review.setPokemon(pokemon);
         Review newReview = reviewRepository.save(review);
 
@@ -39,15 +40,21 @@ public class ReviewServiceImpl implements ReviewService {
 
     }
 
-
-
-
     @Override
     public List<ReviewDto> getReviewsByPokemonId(int id) {
         List<Review> reviews = reviewRepository.findByPokemonId(id);
 
         return reviews.stream().map(review -> mapToDto(review)).collect(Collectors.toList());
     }
+
+    @Override
+    public ReviewDto getReviewById(int reviewId, int pokemonId) {
+        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(()-> new PokemonNotFoundException("Pokemon with associated review not found"));
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new ReviewNotFoundException("Review with associated Pokemon not found"));
+        
+    }
+
 
     // Mappers
     private ReviewDto mapToDto(Review review) {
