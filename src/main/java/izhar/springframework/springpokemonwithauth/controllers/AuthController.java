@@ -1,11 +1,13 @@
 package izhar.springframework.springpokemonwithauth.controllers;
 
+import izhar.springframework.springpokemonwithauth.dto.AuthResponseDto;
 import izhar.springframework.springpokemonwithauth.dto.LoginDto;
 import izhar.springframework.springpokemonwithauth.dto.RegisterDto;
 import izhar.springframework.springpokemonwithauth.models.Role;
 import izhar.springframework.springpokemonwithauth.models.UserEntity;
 import izhar.springframework.springpokemonwithauth.repository.RoleRepository;
 import izhar.springframework.springpokemonwithauth.repository.UserRepository;
+import izhar.springframework.springpokemonwithauth.security.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +32,24 @@ public class AuthController {
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
 
+    private JwtGenerator jwtGenerator;
+
     @Autowired
     public AuthController(AuthenticationManager authenticationManager,
                           UserRepository userRepository,
                           RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          JwtGenerator jwtGenerator
+    ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtGenerator = jwtGenerator;
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<AuthResponseDto> login(
             @RequestBody LoginDto loginDto
             ){
         // authentication manager
@@ -52,7 +59,9 @@ public class AuthController {
                         loginDto.getPassword()));
         // security context is going to hold all the user details so user does not have to keep logging in
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ResponseEntity<>("User signed success!", HttpStatus.OK);
+        String token = jwtGenerator.generateToken(authentication);
+
+        return new ResponseEntity<>(new AuthResponseDto(token), HttpStatus.OK);
     }
 
     @PostMapping("register")
