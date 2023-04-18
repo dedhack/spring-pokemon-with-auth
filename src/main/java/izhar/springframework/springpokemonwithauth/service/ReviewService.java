@@ -11,4 +11,6 @@ public interface ReviewService {
 
     List<ReviewDto> getReviewsByPokemonId(int id);
     ReviewDto getReviewById(int reviewId, int pokemonId);
+
+    ReviewDto updateReview(int pokemonId, int reviewId, ReviewDto reviewDto);
 }
