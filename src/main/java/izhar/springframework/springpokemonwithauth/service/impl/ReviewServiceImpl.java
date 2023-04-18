@@ -81,6 +81,20 @@ public class ReviewServiceImpl implements ReviewService {
         return mapToDto(updateReview);
     }
 
+    @Override
+    public void deleteReview(int pokemonId, int reviewId) {
+        Pokemon pokemon = pokemonRepository.findById(pokemonId).orElseThrow(()-> new PokemonNotFoundException("Pokemon with associated review not found"));
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow(()->new ReviewNotFoundException("Review with associated Pokemon not found"));
+
+        // Not recommended in a production env to use != but supposed to use equals, but it won't work here because it's not a wrapper type
+        if(review.getPokemon().getId() != pokemon.getId()){
+            throw new ReviewNotFoundException("This review does not belong to a pokemon");
+        }
+
+        reviewRepository.delete(review);
+    }
+
 
     // Mappers
     private ReviewDto mapToDto(Review review) {
