@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -43,7 +44,9 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<ReviewDto> getReviewsByPokemonId(int id) {
-        return null;
+        List<Review> reviews = reviewRepository.findByPokemonId(id);
+
+        return reviews.stream().map(review -> mapToDto(review)).collect(Collectors.toList());
     }
 
     // Mappers
